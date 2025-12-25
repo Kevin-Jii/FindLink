@@ -111,11 +111,14 @@ func handleErr(err error) {
 
 func autoMigrate(db *gorm.DB) error {
 	err := db.AutoMigrate(
+		// B端管理后台
 		&model.AdminUser{},
 		&model.AdminUserRole{},
 		&model.Permission{},
 		&model.Role{},
 		&model.RolePermission{},
+		// C端用户
+		&model.User{},
 	)
 	if err != nil {
 		return err

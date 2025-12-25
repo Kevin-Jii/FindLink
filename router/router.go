@@ -89,7 +89,13 @@ func (r *Router) customerRoute(root *gin.RouterGroup) {
 	cstRoot := root.Group("/customer", AuthMiddleware(r.SpanFilter, func(ctx context.Context, token string) (*common.User, error) {
 		return &common.User{}, nil
 	}))
-	cstRoot.Any("/user/info", r.admin.GetUserInfo)
+
+	// C端用户 - 无需鉴权
+	cstRoot.POST("/v1/user/login", r.customer.Login)
+	cstRoot.POST("/v1/user/register", r.customer.Register)
+
+	// C端用户 - 需要鉴权
+	cstRoot.GET("/v1/user/info", r.customer.GetUserInfo)
 }
 
 func (r *Router) adminRoute(root *gin.RouterGroup) {

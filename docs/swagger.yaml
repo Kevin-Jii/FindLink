@@ -37,6 +37,19 @@ definitions:
       sex:
         type: integer
     type: object
+  dto.CustomerUserInfoResp:
+    properties:
+      avatar:
+        type: string
+      gender:
+        type: integer
+      mobile:
+        type: string
+      nickname:
+        type: string
+      user_id:
+        type: integer
+    type: object
   dto.GetVerifyCaptchaResp:
     properties:
       expire:
@@ -117,6 +130,48 @@ definitions:
         type: string
       user_id:
         type: integer
+    type: object
+  dto.UserLoginReq:
+    properties:
+      mobile:
+        description: 手机号
+        type: string
+      password:
+        description: 密码
+        type: string
+    required:
+    - mobile
+    - password
+    type: object
+  dto.UserLoginResp:
+    properties:
+      expire_at:
+        description: 过期时间戳
+        type: integer
+      nickname:
+        description: 昵称
+        type: string
+      token:
+        description: 访问令牌
+        type: string
+      user_id:
+        description: 用户ID
+        type: integer
+    type: object
+  dto.UserRegisterReq:
+    properties:
+      mobile:
+        description: 手机号
+        type: string
+      nickname:
+        description: 昵称
+        type: string
+      password:
+        description: 密码
+        type: string
+    required:
+    - mobile
+    - password
     type: object
 host: localhost:8080
 info:
@@ -315,6 +370,82 @@ paths:
       summary: 校验滑块验证码
       tags:
       - 验证码
+  /customer/v1/user/info:
+    get:
+      consumes:
+      - application/json
+      description: 获取当前登录用户信息
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/api.Resp'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.CustomerUserInfoResp'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取用户信息
+      tags:
+      - C端-用户
+  /customer/v1/user/login:
+    post:
+      consumes:
+      - application/json
+      description: 使用手机号密码登录
+      parameters:
+      - description: 登录参数
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserLoginReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/api.Resp'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.UserLoginResp'
+              type: object
+      summary: C端用户登录
+      tags:
+      - C端-用户
+  /customer/v1/user/register:
+    post:
+      consumes:
+      - application/json
+      description: 使用手机号注册
+      parameters:
+      - description: 注册参数
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserRegisterReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/api.Resp'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.UserLoginResp'
+              type: object
+      summary: C端用户注册
+      tags:
+      - C端-用户
 securityDefinitions:
   ApiKeyAuth:
     in: header
