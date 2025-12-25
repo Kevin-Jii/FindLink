@@ -1,0 +1,323 @@
+basePath: /api/app
+definitions:
+  api.Resp:
+    properties:
+      code:
+        type: integer
+      data: {}
+      err_msg:
+        type: string
+      msg:
+        type: string
+    type: object
+  dto.CheckCaptchaDtoResp:
+    properties:
+      expire:
+        type: integer
+      ticket:
+        type: string
+    type: object
+  dto.CheckCaptchaReq:
+    properties:
+      key:
+        type: string
+      slide_x:
+        type: integer
+      slide_y:
+        type: integer
+    type: object
+  dto.CreateUserReq:
+    properties:
+      mobile:
+        type: string
+      name:
+        type: string
+      nick_name:
+        type: string
+      sex:
+        type: integer
+    type: object
+  dto.GetVerifyCaptchaResp:
+    properties:
+      expire:
+        description: 过期时间
+        type: integer
+      image_base64:
+        description: 包含“data:image/jpeg;base64
+        type: string
+      key:
+        type: string
+      title_height:
+        description: 滑块图片高
+        type: integer
+      title_image_base64:
+        description: 滑块图片，包含“data:image/jpeg;base64
+        type: string
+      title_width:
+        description: 滑块图片宽
+        type: integer
+      title_x:
+        description: 滑块图的x坐标
+        type: integer
+      title_y:
+        description: 滑块图的y坐标
+        type: integer
+    type: object
+  dto.LoginReq:
+    properties:
+      password:
+        description: 密码
+        type: string
+      ticket:
+        description: 验证码ticket（可选）
+        type: string
+      username:
+        description: 用户名
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  dto.LoginResp:
+    properties:
+      expire_at:
+        description: 过期时间戳
+        type: integer
+      name:
+        description: 用户名
+        type: string
+      token:
+        description: 访问令牌
+        type: string
+      user_id:
+        description: 用户ID
+        type: integer
+    type: object
+  dto.UpdateUserReq:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      nick_name:
+        type: string
+      sex:
+        type: integer
+    type: object
+  dto.UpdateUserStatusReq:
+    properties:
+      id:
+        type: integer
+      status:
+        type: integer
+    type: object
+  dto.UserInfoResp:
+    properties:
+      name:
+        type: string
+      user_id:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: 基础后端服务API文档
+  title: App API
+  version: "1.0"
+paths:
+  /admin/v1/user/create:
+    post:
+      consumes:
+      - application/json
+      description: 创建新用户
+      parameters:
+      - description: 用户信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/api.Resp'
+            - properties:
+                data:
+                  properties:
+                    id:
+                      format: int64
+                      type: integer
+                  type: object
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 创建用户
+      tags:
+      - 用户管理
+  /admin/v1/user/info:
+    get:
+      consumes:
+      - application/json
+      description: 获取当前登录用户信息
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/api.Resp'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.UserInfoResp'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取用户信息
+      tags:
+      - 用户管理
+  /admin/v1/user/login:
+    post:
+      consumes:
+      - application/json
+      description: 使用用户名密码登录
+      parameters:
+      - description: 登录参数
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/api.Resp'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.LoginResp'
+              type: object
+      summary: 用户登录
+      tags:
+      - 登录
+  /admin/v1/user/status:
+    post:
+      consumes:
+      - application/json
+      description: 启用或禁用用户
+      parameters:
+      - description: 状态信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateUserStatusReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Resp'
+      security:
+      - ApiKeyAuth: []
+      summary: 更新用户状态
+      tags:
+      - 用户管理
+  /admin/v1/user/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新用户信息
+      parameters:
+      - description: 用户信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Resp'
+      security:
+      - ApiKeyAuth: []
+      summary: 更新用户
+      tags:
+      - 用户管理
+  /admin/v1/user/verify/captcha:
+    get:
+      consumes:
+      - application/json
+      description: 获取滑块验证码图片
+      parameters:
+      - description: 随机字符串
+        in: query
+        name: once
+        type: string
+      - description: 时间戳
+        in: query
+        name: ts
+        type: integer
+      - description: 签名
+        in: query
+        name: sign
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/api.Resp'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.GetVerifyCaptchaResp'
+              type: object
+      summary: 获取滑块验证码
+      tags:
+      - 验证码
+  /admin/v1/user/verify/captcha/check:
+    post:
+      consumes:
+      - application/json
+      description: 校验滑块验证码位置
+      parameters:
+      - description: 验证码校验参数
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CheckCaptchaReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/api.Resp'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.CheckCaptchaDtoResp'
+              type: object
+      summary: 校验滑块验证码
+      tags:
+      - 验证码
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: token
+    type: apiKey
+swagger: "2.0"
