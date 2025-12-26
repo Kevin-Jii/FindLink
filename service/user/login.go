@@ -7,6 +7,7 @@ import (
 
 	"gorm.io/gorm"
 
+	"app/adaptor/repo/model"
 	"app/common"
 	"app/service/dto"
 	"app/utils/tools"
@@ -58,14 +59,14 @@ func (s *Service) Register(ctx context.Context, req *dto.UserRegisterReq) (*dto.
 	}
 
 	// 创建用户
-	user := &dto.UserModel{
+	userModel := &model.User{
 		Nickname: req.Nickname,
 		Mobile:   req.Mobile,
 		Password: tools.Sha256Hash(req.Password),
 		Status:   1,
 	}
 
-	if err := s.userRepo.Create(ctx, user.ToModel()); err != nil {
+	if err := s.userRepo.Create(ctx, userModel); err != nil {
 		return nil, common.DatabaseErr.WithErr(err)
 	}
 
@@ -73,13 +74,13 @@ func (s *Service) Register(ctx context.Context, req *dto.UserRegisterReq) (*dto.
 	token := tools.UUIDHex()
 	expireAt := time.Now().Add(time.Hour * 24 * 7).Unix()
 
-	_ = s.verify.SetToken(ctx, "user:"+token, user.ID, time.Hour*24*7)
+	_ = s.verify.SetToken(ctx, "user:"+token, userModel.ID, time.Hour*24*7)
 
 	return &dto.UserLoginResp{
 		Token:    token,
 		ExpireAt: expireAt,
-		UserID:   user.ID,
-		Nickname: user.Nickname,
+		UserID:   userModel.ID,
+		Nickname: userModel.Nickname,
 	}, common.OK
 }
 

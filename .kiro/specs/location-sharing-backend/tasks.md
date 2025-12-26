@@ -1,0 +1,284 @@
+# Implementation Plan
+
+- [ ] 1. 项目基础设施搭建
+  - [ ] 1.1 添加 PostGIS 和 WebSocket 依赖
+    - 添加 `github.com/gorilla/websocket` WebSocket 库
+    - 添加 `github.com/leanovate/gopter` 属性测试库
+    - 更新 go.mod 并运行 go mod tidy
+    - _Requirements: 8.1, 9.1_
+  - [ ] 1.2 创建 PostgreSQL + PostGIS 数据库迁移
+    - 创建 `migrations/` 目录
+    - 编写 SQL 迁移脚本创建 PostGIS 扩展和表结构
+    - 更新 main.go 的 autoMigrate 函数
+    - _Requirements: 4.1, 9.1, 11.1_
+  - [ ] 1.3 更新配置文件支持 PostgreSQL
+    - 修改 config/config.go 添加 PostgreSQL 配置
+    - 更新 app_local.yml 配置模板
+    - _Requirements: 9.1_
+
+- [ ] 2. 数据模型层实现
+  - [ ] 2.1 创建位置相关模型
+    - 在 `adaptor/repo/model/` 创建 `user_location.go`
+    - 在 `adaptor/repo/model/` 创建 `device_location.go`
+    - 实现 PostGIS POINT 类型的序列化/反序列化
+    - _Requirements: 4.1, 4.8_
+  - [ ] 2.2 编写位置模型 JSON 往返属性测试
+    - **Property 4: Location Entity JSON Round-Trip**
+    - **Validates: Requirements 4.8**
+  - [ ] 2.3 创建好友关系模型
+    - 在 `adaptor/repo/model/` 创建 `friend.go`
+    - 包含 status 和 sharing_status 枚举
+    - _Requirements: 2.1, 2.7_
+  - [ ] 2.4 编写好友模型 JSON 往返属性测试
+    - **Property 2: Friend Entity JSON Round-Trip**
+    - **Validates: Requirements 2.7**
+  - [ ] 2.5 创建设备模型
+    - 在 `adaptor/repo/model/` 创建 `device.go`
+    - 包含 connection_status 枚举
+    - _Requirements: 3.1, 3.6_
+  - [ ] 2.6 编写设备模型 JSON 往返属性测试
+    - **Property 3: Device Entity JSON Round-Trip**
+    - **Validates: Requirements 3.6**
+  - [ ] 2.7 创建地理围栏模型
+    - 在 `adaptor/repo/model/` 创建 `geofence.go`
+    - 实现 PostGIS POINT 类型
+    - _Requirements: 7.1, 7.6_
+  - [ ] 2.8 编写地理围栏模型 JSON 往返属性测试
+    - **Property 5: Geofence Entity JSON Round-Trip**
+    - **Validates: Requirements 7.6**
+  - [ ] 2.9 创建用户设置模型
+    - 在 `adaptor/repo/model/` 创建 `user_settings.go`
+    - _Requirements: 5.5, 5.6_
+  - [ ] 2.10 编写用户设置模型 JSON 往返属性测试
+    - **Property 6: Settings Entity JSON Round-Trip**
+    - **Validates: Requirements 5.6**
+
+- [ ] 3. Checkpoint - 确保所有测试通过
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 4. Redis 缓存层实现
+  - [ ] 4.1 创建位置缓存服务
+    - 在 `adaptor/redis/` 创建 `location_cache.go`
+    - 实现 SetUserLocation, GetUserLocation 方法
+    - 实现 SetDeviceLocation, GetDeviceLocation 方法
+    - 使用 key pattern `loc:user:{userId}` 和 `loc:device:{deviceId}`
+    - _Requirements: 9.1.1, 9.1.2_
+  - [ ] 4.2 创建 Redis GEO 操作服务
+    - 在 `adaptor/redis/` 创建 `geo.go`
+    - 实现 GeoAdd, GeoRadius 方法
+    - 使用 `geo:users` 和 `geo:devices` sorted sets
+    - _Requirements: 9.6, 9.7_
+  - [ ] 4.3 创建好友关系缓存
+    - 实现好友列表缓存，key pattern `friends:{userId}`
+    - 实现缓存失效逻辑
+    - _Requirements: 9.1.3_
+  - [ ] 4.4 编写缓存一致性属性测试
+    - **Property 14: Cache Consistency**
+    - **Validates: Requirements 9.3, 9.4**
+
+- [ ] 5. 数据访问层实现
+  - [ ] 5.1 创建位置仓储
+    - 在 `adaptor/repo/location/` 创建 `repository.go`
+    - 实现 Create, GetLatest, GetHistory 方法
+    - 使用 PostGIS ST_MakePoint 创建 POINT
+    - _Requirements: 4.1, 4.4_
+  - [ ] 5.2 实现批量位置插入
+    - 使用 PostgreSQL COPY 或批量 INSERT
+    - _Requirements: 4.6, 10.5_
+  - [ ] 5.3 编写批量位置存储完整性属性测试
+    - **Property 16: Batch Location Storage Completeness**
+    - **Validates: Requirements 4.6, 4.1.5**
+  - [ ] 5.4 创建好友仓储
+    - 在 `adaptor/repo/friend/` 创建 `repository.go`
+    - 实现 Create, Accept, Reject, List, Remove 方法
+    - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
+  - [ ] 5.5 编写好友关系双向性属性测试
+    - **Property 7: Friend Relationship Bidirectionality**
+    - **Validates: Requirements 2.2**
+  - [ ] 5.6 编写好友删除完整性属性测试
+    - **Property 8: Friend Removal Completeness**
+    - **Validates: Requirements 2.5**
+  - [ ] 5.7 创建设备仓储
+    - 在 `adaptor/repo/device/` 创建 `repository.go`
+    - 实现 Bind, Unbind, List, UpdateSettings, UpdateStatus 方法
+    - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
+  - [ ] 5.8 编写设备绑定唯一性属性测试
+    - **Property 18: Device Binding Uniqueness**
+    - **Validates: Requirements 3.1**
+  - [ ] 5.9 创建地理围栏仓储
+    - 在 `adaptor/repo/geofence/` 创建 `repository.go`
+    - 实现 Create, List, Update, Delete 方法
+    - _Requirements: 7.1, 7.2, 7.3, 7.4_
+
+- [ ] 6. Checkpoint - 确保所有测试通过
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 7. 业务服务层实现
+  - [ ] 7.1 创建位置服务
+    - 在 `service/location/` 创建 `service.go`
+    - 实现 ReportLocation, BatchReportLocation 方法
+    - 实现缓存优先查询逻辑
+    - _Requirements: 4.1, 4.2, 4.3, 4.6_
+  - [ ] 7.2 实现附近好友查询
+    - 使用 Redis GEORADIUS 优先，PostGIS ST_DWithin 降级
+    - _Requirements: 4.7, 9.7_
+  - [ ] 7.3 编写附近好友空间正确性属性测试
+    - **Property 11: Nearby Friends Spatial Correctness**
+    - **Validates: Requirements 4.7, 9.7**
+  - [ ] 7.4 实现位置隐私控制
+    - 检查用户 sharing_status 和 ghost_mode
+    - _Requirements: 4.5, 5.1, 5.2, 5.3_
+  - [ ] 7.5 编写位置隐私强制属性测试
+    - **Property 9: Location Privacy Enforcement**
+    - **Validates: Requirements 4.5**
+  - [ ] 7.6 编写 Ghost 模式隐私属性测试
+    - **Property 10: Ghost Mode Privacy**
+    - **Validates: Requirements 5.3**
+  - [ ] 7.7 实现低精度位置标记
+    - 检查 accuracy 阈值并设置 is_low_accuracy 标志
+    - _Requirements: 4.1.6_
+  - [ ] 7.8 编写低精度位置标记属性测试
+    - **Property 17: Low Accuracy Location Marking**
+    - **Validates: Requirements 4.1.6**
+  - [ ] 7.9 创建好友服务
+    - 在 `service/friend/` 创建 `service.go`
+    - 实现好友请求、接受、拒绝、列表、删除、搜索
+    - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6_
+  - [ ] 7.10 创建设备服务
+    - 在 `service/device/` 创建 `service.go`
+    - 实现设备绑定、解绑、列表、设置更新、状态更新
+    - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
+  - [ ] 7.11 创建地理围栏服务
+    - 在 `service/geofence/` 创建 `service.go`
+    - 实现围栏 CRUD 和边界检测
+    - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
+  - [ ] 7.12 编写地理围栏包含正确性属性测试
+    - **Property 12: Geofence Containment Correctness**
+    - **Validates: Requirements 11.2**
+  - [ ] 7.13 创建地理计算工具
+    - 在 `utils/geo/` 创建 `distance.go`
+    - 实现 Haversine 公式计算距离
+    - _Requirements: 11.1_
+  - [ ] 7.14 编写距离计算精度属性测试
+    - **Property 13: Distance Calculation Accuracy**
+    - **Validates: Requirements 11.1**
+
+- [ ] 8. Checkpoint - 确保所有测试通过
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 9. WebSocket 实时通信实现
+  - [ ] 9.1 创建 WebSocket Hub
+    - 在 `service/websocket/` 创建 `hub.go`
+    - 实现连接注册、注销、订阅管理
+    - _Requirements: 8.1, 8.4_
+  - [ ] 9.2 创建 WebSocket 连接处理
+    - 在 `service/websocket/` 创建 `connection.go`
+    - 实现 JWT 认证、消息读写
+    - _Requirements: 8.1_
+  - [ ] 9.3 实现订阅过滤
+    - 只推送用户订阅的实体更新
+    - _Requirements: 8.5_
+  - [ ] 9.4 编写 WebSocket 订阅过滤属性测试
+    - **Property 15: WebSocket Subscription Filtering**
+    - **Validates: Requirements 8.5**
+  - [ ] 9.5 实现 Redis Pub/Sub 消息分发
+    - 在 `adaptor/redis/` 创建 `pubsub.go`
+    - 实现跨实例位置更新广播
+    - _Requirements: 8.1.2_
+  - [ ] 9.6 实现连接健康检查
+    - 5分钟空闲发送 ping，30秒无响应关闭连接
+    - _Requirements: 8.1.3, 8.1.4_
+  - [ ] 9.7 实现更新节流
+    - 每个实体每秒最多推送1次更新
+    - _Requirements: 8.7_
+
+- [ ] 10. API 控制器层实现
+  - [ ] 10.1 创建位置 API
+    - 在 `api/customer/` 创建 `location.go`
+    - 实现 POST /location/report, GET /location/user/:id, GET /location/device/:id
+    - 实现 POST /location/batch, GET /location/history, GET /location/nearby
+    - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.6, 4.7_
+  - [ ] 10.2 创建好友 API
+    - 在 `api/customer/` 创建 `friend.go`
+    - 实现 POST /friend/request, POST /friend/accept, POST /friend/reject
+    - 实现 GET /friend/list, DELETE /friend/:id, GET /friend/search
+    - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6_
+  - [ ] 10.3 创建设备 API
+    - 在 `api/customer/` 创建 `device.go`
+    - 实现 POST /device/bind, DELETE /device/:id, GET /device/list
+    - 实现 PUT /device/:id/settings, PUT /device/:id/status
+    - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
+  - [ ] 10.4 创建地理围栏 API
+    - 在 `api/customer/` 创建 `geofence.go`
+    - 实现 POST /geofence, GET /geofence/list, PUT /geofence/:id, DELETE /geofence/:id
+    - _Requirements: 7.1, 7.2, 7.3, 7.4_
+  - [ ] 10.5 创建设置 API
+    - 在 `api/customer/` 创建 `settings.go`
+    - 实现 GET /settings, PUT /settings
+    - _Requirements: 5.4, 5.5_
+  - [ ] 10.6 创建 WebSocket 端点
+    - 在 `api/customer/` 创建 `websocket.go`
+    - 实现 GET /ws 升级连接
+    - _Requirements: 8.1_
+
+- [ ] 11. 路由配置更新
+  - [ ] 11.1 更新 customer 路由
+    - 在 `router/router.go` 添加新的 API 路由
+    - 配置鉴权白名单
+    - _Requirements: 1.1_
+  - [ ] 11.2 更新 Controller 初始化
+    - 在 `api/customer/customer.go` 注入新服务
+    - _Requirements: 1.1_
+
+- [ ] 12. DTO 定义
+  - [ ] 12.1 创建位置相关 DTO
+    - 在 `service/dto/` 创建 `location.go`
+    - 定义 LocationReportReq, BatchLocationReportReq, LocationResp, LocationHistoryReq, NearbyFriendResp
+    - _Requirements: 4.1, 4.6, 4.7_
+  - [ ] 12.2 创建好友相关 DTO
+    - 在 `service/dto/` 创建 `friend.go`
+    - 定义 FriendRequestReq, FriendResp, UserSearchResp
+    - _Requirements: 2.1, 2.4, 2.6_
+  - [ ] 12.3 创建设备相关 DTO
+    - 在 `service/dto/` 创建 `device.go`
+    - 定义 DeviceBindReq, DeviceResp, DeviceSettingsReq, DeviceStatusReq
+    - _Requirements: 3.1, 3.2, 3.4, 3.5_
+  - [ ] 12.4 创建地理围栏相关 DTO
+    - 在 `service/dto/` 创建 `geofence.go`
+    - 定义 GeofenceCreateReq, GeofenceResp, GeofenceUpdateReq
+    - _Requirements: 7.1, 7.2, 7.3_
+  - [ ] 12.5 创建设置相关 DTO
+    - 在 `service/dto/` 创建 `settings.go`
+    - 定义 UserSettingsReq, UserSettingsResp
+    - _Requirements: 5.4, 5.5_
+
+- [ ] 13. 错误码扩展
+  - [ ] 13.1 添加新错误码
+    - 在 `common/errno.go` 添加位置、好友、设备、WebSocket、地理围栏相关错误码
+    - _Requirements: 1.2_
+
+- [ ] 14. Checkpoint - 确保所有测试通过
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 15. 通知服务实现
+  - [ ] 15.1 创建通知服务接口
+    - 在 `service/notification/` 创建 `service.go`
+    - 定义推送通知接口（预留实现）
+    - _Requirements: 6.1, 6.2, 6.3, 6.4_
+  - [ ] 15.2 实现地理围栏触发通知
+    - 在位置更新时检查围栏边界
+    - _Requirements: 6.1, 7.5_
+  - [ ] 15.3 实现设备状态通知
+    - 电池低、离线告警
+    - _Requirements: 6.2, 6.3_
+
+- [ ] 16. Swagger 文档更新
+  - [ ] 16.1 添加 API 注释
+    - 为所有新 API 添加 Swagger 注释
+    - _Requirements: 1.1_
+  - [ ] 16.2 生成 Swagger 文档
+    - 运行 swag init 生成文档
+    - _Requirements: 1.1_
+
+- [ ] 17. Final Checkpoint - 确保所有测试通过
+  - Ensure all tests pass, ask the user if questions arise.
