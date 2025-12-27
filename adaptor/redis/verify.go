@@ -1,7 +1,6 @@
 package redis
 
 import (
-	"app/adaptor"
 	"app/config"
 	"context"
 	"fmt"
@@ -23,9 +22,9 @@ type Verify struct {
 	redis *redis.Client
 }
 
-func NewVerify(adaptor adaptor.IAdaptor) *Verify {
+func NewVerify(redisClient *redis.Client) *Verify {
 	return &Verify{
-		redis: adaptor.GetRedis(),
+		redis: redisClient,
 	}
 }
 

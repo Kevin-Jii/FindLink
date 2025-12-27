@@ -30,9 +30,10 @@ func init() {
 }
 
 type Config struct {
-	Server Server `yaml:"server"`
-	Mysql  Mysql  `yaml:"mysql"`
-	Redis  Redis  `yaml:"redis"`
+	Server   Server   `yaml:"server"`
+	Mysql    Mysql    `yaml:"mysql"`
+	Postgres Postgres `yaml:"postgres"`
+	Redis    Redis    `yaml:"redis"`
 }
 
 type Server struct {
@@ -55,9 +56,26 @@ type Mysql struct {
 	MaxIdle  int    `yaml:"max_idle"`
 }
 
+type Postgres struct {
+	Host         string `yaml:"host"`
+	Port         int    `yaml:"port"`
+	User         string `yaml:"user"`
+	Password     string `yaml:"password"`
+	Database     string `yaml:"database"`
+	SSLMode      string `yaml:"ssl_mode"`
+	MaxOpen      int    `yaml:"max_open"`
+	MaxIdle      int    `yaml:"max_idle"`
+	EnablePostGIS bool  `yaml:"enable_postgis"`
+}
+
 func (m *Mysql) GetDsn() string {
 	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=true&loc=Local",
 		m.User, m.Password, m.Host, m.Port, m.Database, m.Charset)
+}
+
+func (p *Postgres) GetDsn() string {
+	return fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
+		p.Host, p.Port, p.User, p.Password, p.Database, p.SSLMode)
 }
 
 type Redis struct {

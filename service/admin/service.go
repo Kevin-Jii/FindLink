@@ -17,7 +17,7 @@ type Service struct {
 func NewService(adaptor adaptor.IAdaptor) *Service {
 	return &Service{
 		adminUser: admin.NewAdminUser(adaptor),
-		verify:    redis.NewVerify(adaptor),
+		verify:    redis.NewVerify(adaptor.GetRedis()),
 		captcha:   captcha.NewSlideCaptcha(),
 	}
 }

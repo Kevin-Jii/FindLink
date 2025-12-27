@@ -23,7 +23,7 @@ func (c *Ctrl) Login(ctx *gin.Context) {
 		api.WriteResp(ctx, nil, common.ParamErr.WithErr(err))
 		return
 	}
-	resp, errno := c.user.Login(ctx.Request.Context(), req)
+	resp, errno := c.User.Login(ctx.Request.Context(), req)
 	api.WriteResp(ctx, resp, errno)
 }
 
@@ -42,7 +42,7 @@ func (c *Ctrl) Register(ctx *gin.Context) {
 		api.WriteResp(ctx, nil, common.ParamErr.WithErr(err))
 		return
 	}
-	resp, errno := c.user.Register(ctx.Request.Context(), req)
+	resp, errno := c.User.Register(ctx.Request.Context(), req)
 	api.WriteResp(ctx, resp, errno)
 }
 
@@ -61,6 +61,6 @@ func (c *Ctrl) GetUserInfo(ctx *gin.Context) {
 		api.WriteResp(ctx, nil, common.AuthErr)
 		return
 	}
-	resp, errno := c.user.GetUserInfo(ctx.Request.Context(), user.UserID)
+	resp, errno := c.User.GetUserInfo(ctx.Request.Context(), user.UserID)
 	api.WriteResp(ctx, resp, errno)
 }

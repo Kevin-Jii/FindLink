@@ -10,6 +10,15 @@ definitions:
       msg:
         type: string
     type: object
+  dto.BatchLocationReportReq:
+    properties:
+      locations:
+        items:
+          $ref: '#/definitions/dto.LocationReportReq'
+        type: array
+    required:
+    - locations
+    type: object
   dto.CheckCaptchaDtoResp:
     properties:
       expire:
@@ -50,6 +59,164 @@ definitions:
       user_id:
         type: integer
     type: object
+  dto.DeviceBindReq:
+    properties:
+      device_id:
+        type: string
+      name:
+        type: string
+      type:
+        description: phone, tablet, watch, tracker, other
+        type: string
+    required:
+    - device_id
+    type: object
+  dto.DeviceResp:
+    properties:
+      battery_level:
+        type: integer
+      connection_status:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      location:
+        $ref: '#/definitions/dto.LocationResp'
+      name:
+        type: string
+      notification_enabled:
+        type: boolean
+      type:
+        type: string
+    type: object
+  dto.DeviceSettingsReq:
+    properties:
+      name:
+        type: string
+      notification_enabled:
+        type: boolean
+    type: object
+  dto.DeviceStatusReq:
+    properties:
+      battery_level:
+        type: integer
+      connection_status:
+        description: online, offline, unknown
+        type: string
+    type: object
+  dto.FriendRequestActionReq:
+    properties:
+      request_id:
+        type: integer
+    required:
+    - request_id
+    type: object
+  dto.FriendRequestReq:
+    properties:
+      message:
+        type: string
+      to_user_id:
+        type: integer
+    required:
+    - to_user_id
+    type: object
+  dto.FriendRequestResp:
+    properties:
+      avatar:
+        type: string
+      created_at:
+        type: string
+      from_user_id:
+        type: integer
+      id:
+        type: integer
+      message:
+        type: string
+      nickname:
+        type: string
+      status:
+        type: string
+    type: object
+  dto.FriendResp:
+    properties:
+      avatar:
+        type: string
+      friend_id:
+        type: integer
+      id:
+        type: integer
+      last_active:
+        type: string
+      location:
+        $ref: '#/definitions/dto.LocationResp'
+      nickname:
+        type: string
+      sharing_status:
+        description: sharing, paused, hidden
+        type: string
+      status:
+        description: pending, accepted, rejected
+        type: string
+      user_id:
+        type: integer
+    type: object
+  dto.GeofenceCreateReq:
+    properties:
+      center_lat:
+        type: number
+      center_lon:
+        type: number
+      name:
+        type: string
+      notify_on_enter:
+        type: boolean
+      notify_on_exit:
+        type: boolean
+      radius_meters:
+        type: number
+    required:
+    - center_lat
+    - center_lon
+    - name
+    - radius_meters
+    type: object
+  dto.GeofenceResp:
+    properties:
+      center_lat:
+        type: number
+      center_lon:
+        type: number
+      created_at:
+        type: string
+      id:
+        type: integer
+      is_active:
+        type: boolean
+      name:
+        type: string
+      notify_on_enter:
+        type: boolean
+      notify_on_exit:
+        type: boolean
+      radius_meters:
+        type: number
+      updated_at:
+        type: string
+    type: object
+  dto.GeofenceUpdateReq:
+    properties:
+      is_active:
+        type: boolean
+      name:
+        type: string
+      notify_on_enter:
+        type: boolean
+      notify_on_exit:
+        type: boolean
+      radius_meters:
+        type: number
+    type: object
   dto.GetVerifyCaptchaResp:
     properties:
       expire:
@@ -74,6 +241,70 @@ definitions:
         type: integer
       title_y:
         description: 滑块图的y坐标
+        type: integer
+    type: object
+  dto.LocationMode:
+    enum:
+    - foreground
+    - background
+    - significant_change
+    type: string
+    x-enum-varnames:
+    - LocationModeForeground
+    - LocationModeBackground
+    - LocationModeSignificantChange
+  dto.LocationReportReq:
+    properties:
+      accuracy:
+        type: number
+      altitude:
+        type: number
+      battery_level:
+        type: integer
+      bearing:
+        type: number
+      device_id:
+        description: 可选，设备上报时使用
+        type: string
+      is_low_accuracy:
+        type: boolean
+      latitude:
+        type: number
+      location_mode:
+        $ref: '#/definitions/dto.LocationMode'
+      longitude:
+        type: number
+      speed:
+        type: number
+    required:
+    - latitude
+    - longitude
+    type: object
+  dto.LocationResp:
+    properties:
+      accuracy:
+        type: number
+      altitude:
+        type: number
+      battery_level:
+        type: integer
+      bearing:
+        type: number
+      created_at:
+        type: string
+      device_id:
+        type: string
+      id:
+        type: integer
+      latitude:
+        type: number
+      location_mode:
+        $ref: '#/definitions/dto.LocationMode'
+      longitude:
+        type: number
+      speed:
+        type: number
+      user_id:
         type: integer
     type: object
   dto.LoginReq:
@@ -104,6 +335,26 @@ definitions:
         type: string
       user_id:
         description: 用户ID
+        type: integer
+    type: object
+  dto.NearbyFriendResp:
+    properties:
+      avatar:
+        type: string
+      battery_level:
+        type: integer
+      distance:
+        description: 距离（米）
+        type: number
+      last_active:
+        type: string
+      latitude:
+        type: number
+      longitude:
+        type: number
+      nickname:
+        type: string
+      user_id:
         type: integer
     type: object
   dto.UpdateUserReq:
@@ -172,6 +423,17 @@ definitions:
     required:
     - mobile
     - password
+    type: object
+  dto.UserSearchResp:
+    properties:
+      avatar:
+        type: string
+      mobile:
+        type: string
+      nickname:
+        type: string
+      user_id:
+        type: integer
     type: object
 host: localhost:8080
 info:
@@ -370,6 +632,649 @@ paths:
       summary: 校验滑块验证码
       tags:
       - 验证码
+  /api/app/customer/v1/device/{device_id}:
+    delete:
+      description: 解绑指定设备
+      parameters:
+      - description: Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 设备ID
+        in: path
+        name: device_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Resp'
+      summary: 解绑设备
+      tags:
+      - device
+  /api/app/customer/v1/device/{device_id}/settings:
+    put:
+      consumes:
+      - application/json
+      description: 更新设备名称和通知设置
+      parameters:
+      - description: Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 设备ID
+        in: path
+        name: device_id
+        required: true
+        type: string
+      - description: 设置信息
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DeviceSettingsReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Resp'
+      summary: 更新设备设置
+      tags:
+      - device
+  /api/app/customer/v1/device/{device_id}/status:
+    put:
+      consumes:
+      - application/json
+      description: 更新设备电池和连接状态
+      parameters:
+      - description: Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 设备ID
+        in: path
+        name: device_id
+        required: true
+        type: string
+      - description: 状态信息
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DeviceStatusReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Resp'
+      summary: 更新设备状态
+      tags:
+      - device
+  /api/app/customer/v1/device/bind:
+    post:
+      consumes:
+      - application/json
+      description: 绑定追踪设备
+      parameters:
+      - description: Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 设备信息
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DeviceBindReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Resp'
+      summary: 绑定设备
+      tags:
+      - device
+  /api/app/customer/v1/device/list:
+    get:
+      description: 获取用户绑定的设备列表
+      parameters:
+      - description: Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/api.Resp'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.DeviceResp'
+                  type: array
+              type: object
+      summary: 获取设备列表
+      tags:
+      - device
+  /api/app/customer/v1/friend/{friend_id}:
+    delete:
+      description: 删除指定好友
+      parameters:
+      - description: Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 好友ID
+        in: path
+        name: friend_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Resp'
+      summary: 删除好友
+      tags:
+      - friend
+  /api/app/customer/v1/friend/accept:
+    post:
+      consumes:
+      - application/json
+      description: 接受指定的好友请求
+      parameters:
+      - description: Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 请求ID
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/dto.FriendRequestActionReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Resp'
+      summary: 接受好友请求
+      tags:
+      - friend
+  /api/app/customer/v1/friend/list:
+    get:
+      description: 获取已接受的好友列表
+      parameters:
+      - description: Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/api.Resp'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.FriendResp'
+                  type: array
+              type: object
+      summary: 获取好友列表
+      tags:
+      - friend
+  /api/app/customer/v1/friend/reject:
+    post:
+      consumes:
+      - application/json
+      description: 拒绝指定的好友请求
+      parameters:
+      - description: Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 请求ID
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/dto.FriendRequestActionReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Resp'
+      summary: 拒绝好友请求
+      tags:
+      - friend
+  /api/app/customer/v1/friend/request:
+    post:
+      consumes:
+      - application/json
+      description: 发送好友请求给指定用户
+      parameters:
+      - description: Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 好友请求
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/dto.FriendRequestReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Resp'
+      summary: 发送好友请求
+      tags:
+      - friend
+  /api/app/customer/v1/friend/requests:
+    get:
+      description: 获取待处理的好友请求
+      parameters:
+      - description: Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/api.Resp'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.FriendRequestResp'
+                  type: array
+              type: object
+      summary: 获取好友请求列表
+      tags:
+      - friend
+  /api/app/customer/v1/friend/search:
+    get:
+      description: 搜索用户
+      parameters:
+      - description: Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 搜索关键词
+        in: query
+        name: keyword
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/api.Resp'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.UserSearchResp'
+                  type: array
+              type: object
+      summary: 搜索用户
+      tags:
+      - friend
+  /api/app/customer/v1/geofence:
+    post:
+      consumes:
+      - application/json
+      description: 创建新的地理围栏
+      parameters:
+      - description: Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 围栏信息
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GeofenceCreateReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Resp'
+      summary: 创建地理围栏
+      tags:
+      - geofence
+  /api/app/customer/v1/geofence/{geofence_id}:
+    delete:
+      description: 删除指定地理围栏
+      parameters:
+      - description: Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 围栏ID
+        in: path
+        name: geofence_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Resp'
+      summary: 删除地理围栏
+      tags:
+      - geofence
+    put:
+      consumes:
+      - application/json
+      description: 更新指定地理围栏
+      parameters:
+      - description: Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 围栏ID
+        in: path
+        name: geofence_id
+        required: true
+        type: integer
+      - description: 更新信息
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GeofenceUpdateReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Resp'
+      summary: 更新地理围栏
+      tags:
+      - geofence
+  /api/app/customer/v1/geofence/list:
+    get:
+      description: 获取用户的所有地理围栏
+      parameters:
+      - description: Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/api.Resp'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.GeofenceResp'
+                  type: array
+              type: object
+      summary: 获取地理围栏列表
+      tags:
+      - geofence
+  /api/app/customer/v1/location/batch:
+    post:
+      consumes:
+      - application/json
+      description: 批量上报用户位置历史
+      parameters:
+      - description: Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 位置列表
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BatchLocationReportReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Resp'
+      summary: 批量上报位置
+      tags:
+      - location
+  /api/app/customer/v1/location/device/{device_id}:
+    get:
+      description: 获取指定设备的位置
+      parameters:
+      - description: Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 设备ID
+        in: path
+        name: device_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/api.Resp'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.LocationResp'
+              type: object
+      summary: 获取设备位置
+      tags:
+      - location
+  /api/app/customer/v1/location/history:
+    get:
+      description: 获取用户位置历史记录
+      parameters:
+      - description: Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 用户ID
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      - description: 开始时间
+        in: query
+        name: start_time
+        required: true
+        type: string
+      - description: 结束时间
+        in: query
+        name: end_time
+        required: true
+        type: string
+      - description: 限制数量
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/api.Resp'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.LocationResp'
+                  type: array
+              type: object
+      summary: 获取位置历史
+      tags:
+      - location
+  /api/app/customer/v1/location/nearby:
+    get:
+      description: 获取附近的好友列表
+      parameters:
+      - description: Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 搜索半径（米）
+        in: query
+        name: radius
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/api.Resp'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.NearbyFriendResp'
+                  type: array
+              type: object
+      summary: 获取附近好友
+      tags:
+      - location
+  /api/app/customer/v1/location/report:
+    post:
+      consumes:
+      - application/json
+      description: 上报用户当前位置
+      parameters:
+      - description: Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 位置信息
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LocationReportReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Resp'
+      summary: 上报位置
+      tags:
+      - location
+  /api/app/customer/v1/location/user/{user_id}:
+    get:
+      description: 获取指定用户的位置
+      parameters:
+      - description: Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 用户ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/api.Resp'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.LocationResp'
+              type: object
+      summary: 获取用户位置
+      tags:
+      - location
+  /api/app/customer/v1/ws:
+    get:
+      description: 建立WebSocket实时连接
+      parameters:
+      - description: Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "101":
+          description: Switching Protocols
+          schema:
+            $ref: '#/definitions/api.Resp'
+      summary: WebSocket连接
+      tags:
+      - websocket
   /customer/v1/user/info:
     get:
       consumes:

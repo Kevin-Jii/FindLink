@@ -331,6 +331,1016 @@
                 }
             }
         },
+        "/api/app/customer/v1/device/bind": {
+            "post": {
+                "description": "绑定追踪设备",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "device"
+                ],
+                "summary": "绑定设备",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "设备信息",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.DeviceBindReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/app/customer/v1/device/list": {
+            "get": {
+                "description": "获取用户绑定的设备列表",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "device"
+                ],
+                "summary": "获取设备列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/api.Resp"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.DeviceResp"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/app/customer/v1/device/{device_id}": {
+            "delete": {
+                "description": "解绑指定设备",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "device"
+                ],
+                "summary": "解绑设备",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "设备ID",
+                        "name": "device_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/app/customer/v1/device/{device_id}/settings": {
+            "put": {
+                "description": "更新设备名称和通知设置",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "device"
+                ],
+                "summary": "更新设备设置",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "设备ID",
+                        "name": "device_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "设置信息",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.DeviceSettingsReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/app/customer/v1/device/{device_id}/status": {
+            "put": {
+                "description": "更新设备电池和连接状态",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "device"
+                ],
+                "summary": "更新设备状态",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "设备ID",
+                        "name": "device_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "状态信息",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.DeviceStatusReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/app/customer/v1/friend/accept": {
+            "post": {
+                "description": "接受指定的好友请求",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "friend"
+                ],
+                "summary": "接受好友请求",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "请求ID",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.FriendRequestActionReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/app/customer/v1/friend/list": {
+            "get": {
+                "description": "获取已接受的好友列表",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "friend"
+                ],
+                "summary": "获取好友列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/api.Resp"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.FriendResp"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/app/customer/v1/friend/reject": {
+            "post": {
+                "description": "拒绝指定的好友请求",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "friend"
+                ],
+                "summary": "拒绝好友请求",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "请求ID",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.FriendRequestActionReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/app/customer/v1/friend/request": {
+            "post": {
+                "description": "发送好友请求给指定用户",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "friend"
+                ],
+                "summary": "发送好友请求",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "好友请求",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.FriendRequestReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/app/customer/v1/friend/requests": {
+            "get": {
+                "description": "获取待处理的好友请求",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "friend"
+                ],
+                "summary": "获取好友请求列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/api.Resp"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.FriendRequestResp"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/app/customer/v1/friend/search": {
+            "get": {
+                "description": "搜索用户",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "friend"
+                ],
+                "summary": "搜索用户",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "搜索关键词",
+                        "name": "keyword",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/api.Resp"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.UserSearchResp"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/app/customer/v1/friend/{friend_id}": {
+            "delete": {
+                "description": "删除指定好友",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "friend"
+                ],
+                "summary": "删除好友",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "好友ID",
+                        "name": "friend_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/app/customer/v1/geofence": {
+            "post": {
+                "description": "创建新的地理围栏",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "geofence"
+                ],
+                "summary": "创建地理围栏",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "围栏信息",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GeofenceCreateReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/app/customer/v1/geofence/list": {
+            "get": {
+                "description": "获取用户的所有地理围栏",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "geofence"
+                ],
+                "summary": "获取地理围栏列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/api.Resp"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.GeofenceResp"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/app/customer/v1/geofence/{geofence_id}": {
+            "put": {
+                "description": "更新指定地理围栏",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "geofence"
+                ],
+                "summary": "更新地理围栏",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "围栏ID",
+                        "name": "geofence_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "更新信息",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GeofenceUpdateReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Resp"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "删除指定地理围栏",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "geofence"
+                ],
+                "summary": "删除地理围栏",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "围栏ID",
+                        "name": "geofence_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/app/customer/v1/location/batch": {
+            "post": {
+                "description": "批量上报用户位置历史",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "location"
+                ],
+                "summary": "批量上报位置",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "位置列表",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.BatchLocationReportReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/app/customer/v1/location/device/{device_id}": {
+            "get": {
+                "description": "获取指定设备的位置",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "location"
+                ],
+                "summary": "获取设备位置",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "设备ID",
+                        "name": "device_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/api.Resp"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.LocationResp"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/app/customer/v1/location/history": {
+            "get": {
+                "description": "获取用户位置历史记录",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "location"
+                ],
+                "summary": "获取位置历史",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "用户ID",
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "开始时间",
+                        "name": "start_time",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "结束时间",
+                        "name": "end_time",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "限制数量",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/api.Resp"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.LocationResp"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/app/customer/v1/location/nearby": {
+            "get": {
+                "description": "获取附近的好友列表",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "location"
+                ],
+                "summary": "获取附近好友",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "搜索半径（米）",
+                        "name": "radius",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/api.Resp"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.NearbyFriendResp"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/app/customer/v1/location/report": {
+            "post": {
+                "description": "上报用户当前位置",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "location"
+                ],
+                "summary": "上报位置",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "位置信息",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.LocationReportReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/app/customer/v1/location/user/{user_id}": {
+            "get": {
+                "description": "获取指定用户的位置",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "location"
+                ],
+                "summary": "获取用户位置",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "用户ID",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/api.Resp"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.LocationResp"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/app/customer/v1/ws": {
+            "get": {
+                "description": "建立WebSocket实时连接",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "websocket"
+                ],
+                "summary": "WebSocket连接",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "101": {
+                        "description": "Switching Protocols",
+                        "schema": {
+                            "$ref": "#/definitions/api.Resp"
+                        }
+                    }
+                }
+            }
+        },
         "/customer/v1/user/info": {
             "get": {
                 "security": [
@@ -480,6 +1490,20 @@
                 }
             }
         },
+        "dto.BatchLocationReportReq": {
+            "type": "object",
+            "required": [
+                "locations"
+            ],
+            "properties": {
+                "locations": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.LocationReportReq"
+                    }
+                }
+            }
+        },
         "dto.CheckCaptchaDtoResp": {
             "type": "object",
             "properties": {
@@ -542,6 +1566,245 @@
                 }
             }
         },
+        "dto.DeviceBindReq": {
+            "type": "object",
+            "required": [
+                "device_id"
+            ],
+            "properties": {
+                "device_id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "description": "phone, tablet, watch, tracker, other",
+                    "type": "string"
+                }
+            }
+        },
+        "dto.DeviceResp": {
+            "type": "object",
+            "properties": {
+                "battery_level": {
+                    "type": "integer"
+                },
+                "connection_status": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "location": {
+                    "$ref": "#/definitions/dto.LocationResp"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "notification_enabled": {
+                    "type": "boolean"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.DeviceSettingsReq": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "notification_enabled": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "dto.DeviceStatusReq": {
+            "type": "object",
+            "properties": {
+                "battery_level": {
+                    "type": "integer"
+                },
+                "connection_status": {
+                    "description": "online, offline, unknown",
+                    "type": "string"
+                }
+            }
+        },
+        "dto.FriendRequestActionReq": {
+            "type": "object",
+            "required": [
+                "request_id"
+            ],
+            "properties": {
+                "request_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.FriendRequestReq": {
+            "type": "object",
+            "required": [
+                "to_user_id"
+            ],
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "to_user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.FriendRequestResp": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "from_user_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "nickname": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.FriendResp": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "friend_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "last_active": {
+                    "type": "string"
+                },
+                "location": {
+                    "$ref": "#/definitions/dto.LocationResp"
+                },
+                "nickname": {
+                    "type": "string"
+                },
+                "sharing_status": {
+                    "description": "sharing, paused, hidden",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "pending, accepted, rejected",
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.GeofenceCreateReq": {
+            "type": "object",
+            "required": [
+                "center_lat",
+                "center_lon",
+                "name",
+                "radius_meters"
+            ],
+            "properties": {
+                "center_lat": {
+                    "type": "number"
+                },
+                "center_lon": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "notify_on_enter": {
+                    "type": "boolean"
+                },
+                "notify_on_exit": {
+                    "type": "boolean"
+                },
+                "radius_meters": {
+                    "type": "number"
+                }
+            }
+        },
+        "dto.GeofenceResp": {
+            "type": "object",
+            "properties": {
+                "center_lat": {
+                    "type": "number"
+                },
+                "center_lon": {
+                    "type": "number"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "notify_on_enter": {
+                    "type": "boolean"
+                },
+                "notify_on_exit": {
+                    "type": "boolean"
+                },
+                "radius_meters": {
+                    "type": "number"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.GeofenceUpdateReq": {
+            "type": "object",
+            "properties": {
+                "is_active": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "notify_on_enter": {
+                    "type": "boolean"
+                },
+                "notify_on_exit": {
+                    "type": "boolean"
+                },
+                "radius_meters": {
+                    "type": "number"
+                }
+            }
+        },
         "dto.GetVerifyCaptchaResp": {
             "type": "object",
             "properties": {
@@ -574,6 +1837,100 @@
                 },
                 "title_y": {
                     "description": "滑块图的y坐标",
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.LocationMode": {
+            "type": "string",
+            "enum": [
+                "foreground",
+                "background",
+                "significant_change"
+            ],
+            "x-enum-varnames": [
+                "LocationModeForeground",
+                "LocationModeBackground",
+                "LocationModeSignificantChange"
+            ]
+        },
+        "dto.LocationReportReq": {
+            "type": "object",
+            "required": [
+                "latitude",
+                "longitude"
+            ],
+            "properties": {
+                "accuracy": {
+                    "type": "number"
+                },
+                "altitude": {
+                    "type": "number"
+                },
+                "battery_level": {
+                    "type": "integer"
+                },
+                "bearing": {
+                    "type": "number"
+                },
+                "device_id": {
+                    "description": "可选，设备上报时使用",
+                    "type": "string"
+                },
+                "is_low_accuracy": {
+                    "type": "boolean"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "location_mode": {
+                    "$ref": "#/definitions/dto.LocationMode"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "speed": {
+                    "type": "number"
+                }
+            }
+        },
+        "dto.LocationResp": {
+            "type": "object",
+            "properties": {
+                "accuracy": {
+                    "type": "number"
+                },
+                "altitude": {
+                    "type": "number"
+                },
+                "battery_level": {
+                    "type": "integer"
+                },
+                "bearing": {
+                    "type": "number"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "device_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "location_mode": {
+                    "$ref": "#/definitions/dto.LocationMode"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "speed": {
+                    "type": "number"
+                },
+                "user_id": {
                     "type": "integer"
                 }
             }
@@ -616,6 +1973,36 @@
                 },
                 "user_id": {
                     "description": "用户ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.NearbyFriendResp": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "battery_level": {
+                    "type": "integer"
+                },
+                "distance": {
+                    "description": "距离（米）",
+                    "type": "number"
+                },
+                "last_active": {
+                    "type": "string"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "nickname": {
+                    "type": "string"
+                },
+                "user_id": {
                     "type": "integer"
                 }
             }
@@ -715,6 +2102,23 @@
                 "password": {
                     "description": "密码",
                     "type": "string"
+                }
+            }
+        },
+        "dto.UserSearchResp": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "mobile": {
+                    "type": "string"
+                },
+                "nickname": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         }

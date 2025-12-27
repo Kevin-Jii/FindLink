@@ -13,6 +13,9 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+
+	// 避免未使用的导入错误
+	_ "app/adaptor/repo/model"
 )
 
 type IRouter interface {
@@ -96,6 +99,51 @@ func (r *Router) customerRoute(root *gin.RouterGroup) {
 
 	// C端用户 - 需要鉴权
 	cstRoot.GET("/v1/user/info", r.customer.GetUserInfo)
+
+	// 位置相关
+	locationGroup := cstRoot.Group("/v1/location")
+	{
+		locationGroup.POST("/report", r.customer.Report)
+		locationGroup.POST("/batch", r.customer.BatchReport)
+		locationGroup.GET("/user/:user_id", r.customer.GetUserLocation)
+		locationGroup.GET("/device/:device_id", r.customer.GetDeviceLocation)
+		locationGroup.GET("/history", r.customer.GetLocationHistory)
+		locationGroup.GET("/nearby", r.customer.GetNearbyFriends)
+	}
+
+	// 好友相关
+	friendGroup := cstRoot.Group("/v1/friend")
+	{
+		friendGroup.POST("/request", r.customer.SendFriendRequest)
+		friendGroup.GET("/requests", r.customer.GetFriendRequests)
+		friendGroup.POST("/accept", r.customer.AcceptFriendRequest)
+		friendGroup.POST("/reject", r.customer.RejectFriendRequest)
+		friendGroup.GET("/list", r.customer.GetFriendList)
+		friendGroup.DELETE("/:friend_id", r.customer.RemoveFriend)
+		friendGroup.GET("/search", r.customer.SearchUsers)
+	}
+
+	// 设备相关
+	deviceGroup := cstRoot.Group("/v1/device")
+	{
+		deviceGroup.POST("/bind", r.customer.BindDevice)
+		deviceGroup.GET("/list", r.customer.GetDeviceList)
+		deviceGroup.PUT("/:device_id/settings", r.customer.UpdateDeviceSettings)
+		deviceGroup.PUT("/:device_id/status", r.customer.UpdateDeviceStatus)
+		deviceGroup.DELETE("/:device_id", r.customer.UnbindDevice)
+	}
+
+	// 地理围栏相关
+	geofenceGroup := cstRoot.Group("/v1/geofence")
+	{
+		geofenceGroup.POST("", r.customer.CreateGeofence)
+		geofenceGroup.GET("/list", r.customer.GetGeofenceList)
+		geofenceGroup.PUT("/:geofence_id", r.customer.UpdateGeofence)
+		geofenceGroup.DELETE("/:geofence_id", r.customer.DeleteGeofence)
+	}
+
+	// WebSocket
+	cstRoot.GET("/v1/ws", r.customer.WebSocketConnect)
 }
 
 func (r *Router) adminRoute(root *gin.RouterGroup) {

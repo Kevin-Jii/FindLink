@@ -119,6 +119,15 @@ func autoMigrate(db *gorm.DB) error {
 		&model.RolePermission{},
 		// C端用户
 		&model.User{},
+		// 位置共享功能
+		&model.UserLocation{},
+		&model.DeviceLocation{},
+		&model.Friend{},
+		&model.FriendRequest{},
+		&model.Device{},
+		&model.Geofence{},
+		&model.GeofenceEvent{},
+		&model.UserSettings{},
 	)
 	if err != nil {
 		return err
