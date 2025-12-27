@@ -26,6 +26,9 @@ func NewApp(port int, router IRouter) *App {
 	// Recover 中间件，全局捕获panic
 	engine.Use(gin.Recovery())
 
+	// CORS 中间件，解决跨域问题
+	engine.Use(corsMiddleware())
+
 	// 日志中间件,自定义过滤器，某些接口不需要记录日志
 	engine.Use(AccessLogMiddleware(router.AccessRecordFilter))
 
@@ -35,6 +38,22 @@ func NewApp(port int, router IRouter) *App {
 	return &App{
 		server: engine,
 		addr:   ":" + strconv.Itoa(port),
+	}
+}
+
+func corsMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS")
+		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With")
+		c.Header("Access-Control-Max-Age", "86400")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(http.StatusNoContent)
+			return
+		}
+
+		c.Next()
 	}
 }
 

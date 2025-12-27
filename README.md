@@ -54,7 +54,7 @@
 
 ```yaml
 server:
-  http_port: 8080
+  http_port: 8900
   log_level: debug
 
 mysql:

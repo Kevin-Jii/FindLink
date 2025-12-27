@@ -16,6 +16,7 @@ type IVerify interface {
 	GetCaptchaTicket(ctx context.Context, key string) (string, error)
 	SetToken(ctx context.Context, token string, userID int64, expire time.Duration) error
 	GetToken(ctx context.Context, token string) (int64, error)
+	DelToken(ctx context.Context, token string) error
 }
 
 type Verify struct {
@@ -74,4 +75,9 @@ func (v *Verify) SetToken(ctx context.Context, token string, userID int64, expir
 func (v *Verify) GetToken(ctx context.Context, token string) (int64, error) {
 	redisKey := fmtTokenKey(token)
 	return v.redis.Get(redisKey).Int64()
+}
+
+func (v *Verify) DelToken(ctx context.Context, token string) error {
+	redisKey := fmtTokenKey(token)
+	return v.redis.Del(redisKey).Err()
 }

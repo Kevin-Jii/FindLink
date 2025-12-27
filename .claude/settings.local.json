@@ -6,7 +6,12 @@
       "Bash(go build:*)",
       "Bash(go run:*)",
       "Bash(timeout 3)",
-      "Bash(swag init:*)"
+      "Bash(swag init:*)",
+      "Bash(ipconfig:*)",
+      "Bash(findstr:*)",
+      "Bash(netstat:*)",
+      "Bash(taskkill:*)",
+      "Bash(powershell:*)"
     ],
     "deny": [],
     "ask": []

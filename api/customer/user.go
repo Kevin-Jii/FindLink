@@ -3,6 +3,7 @@ package customer
 import (
 	"app/api"
 	"app/common"
+	"app/consts"
 	"app/service/dto"
 
 	"github.com/gin-gonic/gin"
@@ -16,7 +17,7 @@ import (
 // @Produce      json
 // @Param        request  body  dto.UserLoginReq  true  "登录参数"
 // @Success      200  {object}  api.Resp{data=dto.UserLoginResp}
-// @Router       /customer/v1/user/login [post]
+// @Router       /api/app/customer/v1/user/login [post]
 func (c *Ctrl) Login(ctx *gin.Context) {
 	req := &dto.UserLoginReq{}
 	if err := ctx.BindJSON(req); err != nil {
@@ -35,7 +36,7 @@ func (c *Ctrl) Login(ctx *gin.Context) {
 // @Produce      json
 // @Param        request  body  dto.UserRegisterReq  true  "注册参数"
 // @Success      200  {object}  api.Resp{data=dto.UserLoginResp}
-// @Router       /customer/v1/user/register [post]
+// @Router       /api/app/customer/v1/user/register [post]
 func (c *Ctrl) Register(ctx *gin.Context) {
 	req := &dto.UserRegisterReq{}
 	if err := ctx.BindJSON(req); err != nil {
@@ -54,7 +55,7 @@ func (c *Ctrl) Register(ctx *gin.Context) {
 // @Produce      json
 // @Security     ApiKeyAuth
 // @Success      200  {object}  api.Resp{data=dto.CustomerUserInfoResp}
-// @Router       /customer/v1/user/info [get]
+// @Router       /api/app/customer/v1/user/info [get]
 func (c *Ctrl) GetUserInfo(ctx *gin.Context) {
 	user := api.GetUserFromCtx(ctx)
 	if user == nil {
@@ -63,4 +64,26 @@ func (c *Ctrl) GetUserInfo(ctx *gin.Context) {
 	}
 	resp, errno := c.User.GetUserInfo(ctx.Request.Context(), user.UserID)
 	api.WriteResp(ctx, resp, errno)
+}
+
+// Logout C端用户退出登录
+// @Summary      用户退出登录
+// @Description  清除登录token
+// @Tags         C端-用户
+// @Produce      json
+// @Security     ApiKeyAuth
+// @Success      200  {object}  api.Resp
+// @Router       /api/app/customer/v1/user/logout [post]
+func (c *Ctrl) Logout(ctx *gin.Context) {
+	user := api.GetUserFromCtx(ctx)
+	if user == nil {
+		api.WriteResp(ctx, nil, common.AuthErr)
+		return
+	}
+	token := ctx.GetHeader(consts.UserTokenKey)
+	if err := c.User.Logout(ctx.Request.Context(), token); err != nil {
+		api.WriteResp(ctx, nil, common.DatabaseErr.WithErr(err))
+		return
+	}
+	api.WriteResp(ctx, nil, common.OK)
 }

@@ -60,3 +60,15 @@ func Warn(msg string, fields ...zap.Field) {
 func Error(msg string, fields ...zap.Field) {
 	logger.Error(msg, fields...)
 }
+
+func GetLogger() *zap.Logger {
+	return logger
+}
+
+func String(key string, val string) zap.Field {
+	return zap.String(key, val)
+}
+
+func Any(key string, val any) zap.Field {
+	return zap.Any(key, val)
+}

@@ -8,7 +8,7 @@ import (
 	"app/config"
 	"context"
 	"net/http"
-	"strings"
+	"app/utils/logger"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -71,8 +71,12 @@ func (r *Router) Register(app *gin.Engine) {
 }
 
 func (r *Router) SpanFilter(ctx *gin.Context) bool {
-	path := strings.Replace(ctx.Request.URL.Path, r.rootPath, "", 1)
-	_, ok := AdminAuthWhiteList[path]
+	// 检查白名单时需要带上 rootPath，因为白名单存储的是完整路径
+	fullPath := ctx.Request.URL.Path
+	logger.Debug("SpanFilter",
+		logger.String("fullPath", fullPath),
+		logger.Any("whiteList", AdminAuthWhiteList))
+	_, ok := AdminAuthWhiteList[fullPath]
 	if ok {
 		return false
 	}
@@ -99,6 +103,7 @@ func (r *Router) customerRoute(root *gin.RouterGroup) {
 
 	// C端用户 - 需要鉴权
 	cstRoot.GET("/v1/user/info", r.customer.GetUserInfo)
+	cstRoot.POST("/v1/user/logout", r.customer.Logout)
 
 	// 位置相关
 	locationGroup := cstRoot.Group("/v1/location")

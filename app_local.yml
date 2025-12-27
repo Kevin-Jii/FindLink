@@ -1,6 +1,6 @@
 
 server:
-  http_port: 8080
+  http_port: 8900
   enable_pprof: true
   log_level: debug
   env: dev

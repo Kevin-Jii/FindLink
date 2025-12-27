@@ -1318,36 +1318,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/app/customer/v1/ws": {
-            "get": {
-                "description": "建立WebSocket实时连接",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "websocket"
-                ],
-                "summary": "WebSocket连接",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Token",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "101": {
-                        "description": "Switching Protocols",
-                        "schema": {
-                            "$ref": "#/definitions/api.Resp"
-                        }
-                    }
-                }
-            }
-        },
-        "/customer/v1/user/info": {
+        "/api/app/customer/v1/user/info": {
             "get": {
                 "security": [
                     {
@@ -1387,7 +1358,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/customer/v1/user/login": {
+        "/api/app/customer/v1/user/login": {
             "post": {
                 "description": "使用手机号密码登录",
                 "consumes": [
@@ -1433,7 +1404,32 @@ const docTemplate = `{
                 }
             }
         },
-        "/customer/v1/user/register": {
+        "/api/app/customer/v1/user/logout": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "清除登录token",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "C端-用户"
+                ],
+                "summary": "用户退出登录",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/app/customer/v1/user/register": {
             "post": {
                 "description": "使用手机号注册",
                 "consumes": [
@@ -1474,6 +1470,35 @@ const docTemplate = `{
                                     }
                                 }
                             ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/app/customer/v1/ws": {
+            "get": {
+                "description": "建立WebSocket实时连接",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "websocket"
+                ],
+                "summary": "WebSocket连接",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "101": {
+                        "description": "Switching Protocols",
+                        "schema": {
+                            "$ref": "#/definitions/api.Resp"
                         }
                     }
                 }
@@ -2141,7 +2166,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8080",
+	Host:             "localhost:8900",
 	BasePath:         "/api/app",
 	Schemes:          []string{},
 	Title:            "App API",

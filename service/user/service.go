@@ -1,6 +1,8 @@
 package user
 
 import (
+	"context"
+
 	"app/adaptor"
 	"app/adaptor/redis"
 	"app/adaptor/repo/user"
@@ -16,4 +18,9 @@ func NewService(adaptor adaptor.IAdaptor) *Service {
 		userRepo: user.NewUser(adaptor),
 		verify:   redis.NewVerify(adaptor.GetRedis()),
 	}
+}
+
+// Logout 用户退出登录
+func (s *Service) Logout(ctx context.Context, token string) error {
+	return s.verify.DelToken(ctx, token)
 }

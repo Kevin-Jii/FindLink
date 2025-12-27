@@ -6,7 +6,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:8080",
+    "host": "localhost:8900",
     "basePath": "/api/app",
     "paths": {
         "/admin/v1/user/create": {
@@ -1312,36 +1312,7 @@
                 }
             }
         },
-        "/api/app/customer/v1/ws": {
-            "get": {
-                "description": "建立WebSocket实时连接",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "websocket"
-                ],
-                "summary": "WebSocket连接",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Token",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "101": {
-                        "description": "Switching Protocols",
-                        "schema": {
-                            "$ref": "#/definitions/api.Resp"
-                        }
-                    }
-                }
-            }
-        },
-        "/customer/v1/user/info": {
+        "/api/app/customer/v1/user/info": {
             "get": {
                 "security": [
                     {
@@ -1381,7 +1352,7 @@
                 }
             }
         },
-        "/customer/v1/user/login": {
+        "/api/app/customer/v1/user/login": {
             "post": {
                 "description": "使用手机号密码登录",
                 "consumes": [
@@ -1427,7 +1398,32 @@
                 }
             }
         },
-        "/customer/v1/user/register": {
+        "/api/app/customer/v1/user/logout": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "清除登录token",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "C端-用户"
+                ],
+                "summary": "用户退出登录",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/app/customer/v1/user/register": {
             "post": {
                 "description": "使用手机号注册",
                 "consumes": [
@@ -1468,6 +1464,35 @@
                                     }
                                 }
                             ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/app/customer/v1/ws": {
+            "get": {
+                "description": "建立WebSocket实时连接",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "websocket"
+                ],
+                "summary": "WebSocket连接",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "101": {
+                        "description": "Switching Protocols",
+                        "schema": {
+                            "$ref": "#/definitions/api.Resp"
                         }
                     }
                 }

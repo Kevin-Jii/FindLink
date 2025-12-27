@@ -435,7 +435,7 @@ definitions:
       user_id:
         type: integer
     type: object
-host: localhost:8080
+host: localhost:8900
 info:
   contact: {}
   description: 基础后端服务API文档
@@ -1256,26 +1256,7 @@ paths:
       summary: 获取用户位置
       tags:
       - location
-  /api/app/customer/v1/ws:
-    get:
-      description: 建立WebSocket实时连接
-      parameters:
-      - description: Token
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "101":
-          description: Switching Protocols
-          schema:
-            $ref: '#/definitions/api.Resp'
-      summary: WebSocket连接
-      tags:
-      - websocket
-  /customer/v1/user/info:
+  /api/app/customer/v1/user/info:
     get:
       consumes:
       - application/json
@@ -1297,7 +1278,7 @@ paths:
       summary: 获取用户信息
       tags:
       - C端-用户
-  /customer/v1/user/login:
+  /api/app/customer/v1/user/login:
     post:
       consumes:
       - application/json
@@ -1324,7 +1305,22 @@ paths:
       summary: C端用户登录
       tags:
       - C端-用户
-  /customer/v1/user/register:
+  /api/app/customer/v1/user/logout:
+    post:
+      description: 清除登录token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Resp'
+      security:
+      - ApiKeyAuth: []
+      summary: 用户退出登录
+      tags:
+      - C端-用户
+  /api/app/customer/v1/user/register:
     post:
       consumes:
       - application/json
@@ -1351,6 +1347,25 @@ paths:
       summary: C端用户注册
       tags:
       - C端-用户
+  /api/app/customer/v1/ws:
+    get:
+      description: 建立WebSocket实时连接
+      parameters:
+      - description: Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "101":
+          description: Switching Protocols
+          schema:
+            $ref: '#/definitions/api.Resp'
+      summary: WebSocket连接
+      tags:
+      - websocket
 securityDefinitions:
   ApiKeyAuth:
     in: header

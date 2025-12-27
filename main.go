@@ -20,7 +20,7 @@ import (
 // @version         1.0
 // @description     基础后端服务API文档
 
-// @host      localhost:8080
+// @host      localhost:8900
 // @BasePath  /api/app
 
 // @securityDefinitions.apikey ApiKeyAuth
