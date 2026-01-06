@@ -4,8 +4,8 @@ import "app/adaptor/repo/model"
 
 // UserLoginReq C端用户登录请求
 type UserLoginReq struct {
-	Mobile   string `json:"mobile" binding:"required"`   // 手机号
-	Password string `json:"password" binding:"required"` // 密码
+	Mobile   string `json:"mobile" binding:"required,len=11"`         // 手机号
+	Password string `json:"password" binding:"required,min=6,max=32"` // 密码
 }
 
 // UserLoginResp C端用户登录响应
@@ -18,9 +18,9 @@ type UserLoginResp struct {
 
 // UserRegisterReq C端用户注册请求
 type UserRegisterReq struct {
-	Mobile   string `json:"mobile" binding:"required"`   // 手机号
-	Password string `json:"password" binding:"required"` // 密码
-	Nickname string `json:"nickname"`                    // 昵称
+	Mobile   string `json:"mobile" binding:"required,len=11"`         // 手机号
+	Password string `json:"password" binding:"required,min=6,max=32"` // 密码
+	Nickname string `json:"nickname" binding:"max=32"`                // 昵称
 }
 
 // CustomerUserInfoResp C端用户信息响应

@@ -1,26 +1,41 @@
 package api
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
+
 	"app/common"
 	"app/consts"
-	"net/http"
+	"app/middleware"
 )
 
 type Resp struct {
-	Code   int    `json:"code"`
-	Msg    string `json:"msg"`
-	ErrMsg string `json:"err_msg"`
-	Data   any    `json:"data"`
+	Code    int    `json:"code"`
+	Msg     string `json:"msg"`
+	Data    any    `json:"data"`
+	TraceID string `json:"trace_id,omitempty"`
 }
 
+// WriteResp 统一响应输出
 func WriteResp(ctx *gin.Context, data any, errno common.Errno) {
+	traceID := middleware.GetTraceID(ctx)
 	ctx.JSON(http.StatusOK, Resp{
-		Code:   errno.Code,
-		Msg:    errno.Msg,
-		ErrMsg: errno.ErrMsg,
-		Data:   data,
+		Code:    errno.Code,
+		Msg:     errno.Msg,
+		Data:    data,
+		TraceID: traceID,
 	})
+}
+
+// WriteSuccess 成功响应
+func WriteSuccess(ctx *gin.Context, data any) {
+	WriteResp(ctx, data, common.OK)
+}
+
+// WriteError 错误响应
+func WriteError(ctx *gin.Context, errno common.Errno) {
+	WriteResp(ctx, nil, errno)
 }
 
 func GetUserFromCtx(ctx *gin.Context) *common.User {

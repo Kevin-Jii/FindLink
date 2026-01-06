@@ -9,27 +9,31 @@ import (
 	"app/utils/tools"
 )
 
-// Login 用户登录
+// Login 管理员登录
 func (s *Service) Login(ctx context.Context, req *dto.LoginReq) (*dto.LoginResp, common.Errno) {
-	// 查询用户（这里简化处理，实际应该查数据库）
 	user, err := s.adminUser.GetUserByUsername(ctx, req.Username)
 	if err != nil {
 		return nil, common.UserNotFoundErr
 	}
 
-	// 验证密码（实际应该用加密比对）
-	if user.Password != tools.Sha256Hash(req.Password) {
+	// 使用bcrypt验证密码
+	if !tools.CheckPassword(req.Password, user.Password) {
 		return nil, common.AuthErr.WithMsg("密码错误")
 	}
 
-	// 生成token
+	// 检查用户状态
+	if user.Status != 1 {
+		return nil, common.AuthErr.WithMsg("账户已被禁用")
+	}
+
+	// 生成token，添加admin前缀区分
 	token := tools.UUIDHex()
 	expireAt := time.Now().Add(time.Hour * 24).Unix()
 
 	// 存储token到redis
-	err = s.verify.SetToken(ctx, token, user.ID, time.Hour*24)
+	err = s.verify.SetToken(ctx, "admin:"+token, user.ID, time.Hour*24)
 	if err != nil {
-		return nil, common.RedisErr.WithErr(err)
+		return nil, common.RedisErr
 	}
 
 	return &dto.LoginResp{

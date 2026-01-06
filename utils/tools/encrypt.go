@@ -3,18 +3,25 @@ package tools
 import (
 	"crypto/sha256"
 	"encoding/hex"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
+// Sha256Hash SHA256哈希 (用于非密码场景)
 func Sha256Hash(text string) string {
-	// 创建一个新的sha256哈希对象
 	hash := sha256.New()
-
-	// 将字符串写入哈希对象
 	hash.Write([]byte(text))
+	return hex.EncodeToString(hash.Sum(nil))
+}
 
-	// 从哈希对象中获取哈希值
-	hashBytes := hash.Sum(nil)
+// HashPassword 使用bcrypt加密密码
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	return string(bytes), err
+}
 
-	// 将字节切片转换为十六进制字符串
-	return hex.EncodeToString(hashBytes)
+// CheckPassword 验证密码
+func CheckPassword(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
 }

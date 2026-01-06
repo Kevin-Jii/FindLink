@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/goccy/go-yaml"
@@ -37,10 +38,11 @@ type Config struct {
 }
 
 type Server struct {
-	HttpPort    int    `yaml:"http_port"`
-	Env         string `yaml:"env"`
-	EnablePprof bool   `yaml:"enable_pprof"`
-	LogLevel    string `yaml:"log_level"`
+	HttpPort        int    `yaml:"http_port"`
+	Env             string `yaml:"env"`
+	EnablePprof     bool   `yaml:"enable_pprof"`
+	LogLevel        string `yaml:"log_level"`
+	ShutdownTimeout int    `yaml:"shutdown_timeout"` // 优雅关闭超时时间(秒)
 }
 
 type Mysql struct {
@@ -57,15 +59,15 @@ type Mysql struct {
 }
 
 type Postgres struct {
-	Host         string `yaml:"host"`
-	Port         int    `yaml:"port"`
-	User         string `yaml:"user"`
-	Password     string `yaml:"password"`
-	Database     string `yaml:"database"`
-	SSLMode      string `yaml:"ssl_mode"`
-	MaxOpen      int    `yaml:"max_open"`
-	MaxIdle      int    `yaml:"max_idle"`
-	EnablePostGIS bool  `yaml:"enable_postgis"`
+	Host          string `yaml:"host"`
+	Port          int    `yaml:"port"`
+	User          string `yaml:"user"`
+	Password      string `yaml:"password"`
+	Database      string `yaml:"database"`
+	SSLMode       string `yaml:"ssl_mode"`
+	MaxOpen       int    `yaml:"max_open"`
+	MaxIdle       int    `yaml:"max_idle"`
+	EnablePostGIS bool   `yaml:"enable_postgis"`
 }
 
 func (m *Mysql) GetDsn() string {
@@ -101,6 +103,7 @@ func InitConfig() *Config {
 		if err != nil {
 			panic(err)
 		}
+		applyEnvOverrides(tempConf)
 		return tempConf
 	}
 
@@ -109,7 +112,58 @@ func InitConfig() *Config {
 	if err != nil {
 		panic(err)
 	}
+
+	// 应用环境变量覆盖
+	applyEnvOverrides(tempConf)
 	return tempConf
+}
+
+// applyEnvOverrides 环境变量覆盖配置
+func applyEnvOverrides(conf *Config) {
+	// Server
+	if v := os.Getenv("APP_HTTP_PORT"); v != "" {
+		if port, err := strconv.Atoi(v); err == nil {
+			conf.Server.HttpPort = port
+		}
+	}
+	if v := os.Getenv("APP_ENV"); v != "" {
+		conf.Server.Env = v
+	}
+	if v := os.Getenv("APP_LOG_LEVEL"); v != "" {
+		conf.Server.LogLevel = v
+	}
+
+	// MySQL
+	if v := os.Getenv("MYSQL_HOST"); v != "" {
+		conf.Mysql.Host = v
+	}
+	if v := os.Getenv("MYSQL_PORT"); v != "" {
+		if port, err := strconv.Atoi(v); err == nil {
+			conf.Mysql.Port = port
+		}
+	}
+	if v := os.Getenv("MYSQL_USER"); v != "" {
+		conf.Mysql.User = v
+	}
+	if v := os.Getenv("MYSQL_PASSWORD"); v != "" {
+		conf.Mysql.Password = v
+	}
+	if v := os.Getenv("MYSQL_DATABASE"); v != "" {
+		conf.Mysql.Database = v
+	}
+
+	// Redis
+	if v := os.Getenv("REDIS_ADDR"); v != "" {
+		conf.Redis.Addr = v
+	}
+	if v := os.Getenv("REDIS_PASSWORD"); v != "" {
+		conf.Redis.PWD = v
+	}
+
+	// 设置默认值
+	if conf.Server.ShutdownTimeout == 0 {
+		conf.Server.ShutdownTimeout = 10
+	}
 }
 
 func getFromRemoteAndWatchUpdate(v *viper.Viper) (*Config, error) {
@@ -121,7 +175,6 @@ func getFromRemoteAndWatchUpdate(v *viper.Viper) (*Config, error) {
 		return nil, err
 	}
 
-	// 反序列化到结构体
 	if err := v.Unmarshal(&tempConf); err != nil {
 		return nil, err
 	}
@@ -151,5 +204,5 @@ func getFromLocal() (*Config, error) {
 		}
 		return &tempConf, nil
 	}
-	return nil, fmt.Errorf("local config file not found ,file_name: %s", localConfigPath)
+	return nil, fmt.Errorf("local config file not found, file_name: %s", localConfigPath)
 }

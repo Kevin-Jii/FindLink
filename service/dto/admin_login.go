@@ -39,9 +39,9 @@ type CheckCaptchaDtoResp struct {
 
 // LoginReq 登录请求
 type LoginReq struct {
-	Username string `json:"username" binding:"required"` // 用户名
-	Password string `json:"password" binding:"required"` // 密码
-	Ticket   string `json:"ticket"`                      // 验证码ticket（可选）
+	Username string `json:"username" binding:"required,min=2,max=32"` // 用户名
+	Password string `json:"password" binding:"required,min=6,max=32"` // 密码
+	Ticket   string `json:"ticket"`                                   // 验证码ticket（可选）
 }
 
 // LoginResp 登录响应

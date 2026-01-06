@@ -20,10 +20,11 @@ func (s *Service) Login(ctx context.Context, req *dto.UserLoginReq) (*dto.UserLo
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, common.UserNotFoundErr
 		}
-		return nil, common.DatabaseErr.WithErr(err)
+		return nil, common.DatabaseErr
 	}
 
-	if user.Password != tools.Sha256Hash(req.Password) {
+	// 使用bcrypt验证密码
+	if !tools.CheckPassword(req.Password, user.Password) {
 		return nil, common.AuthErr.WithMsg("密码错误")
 	}
 
@@ -36,7 +37,7 @@ func (s *Service) Login(ctx context.Context, req *dto.UserLoginReq) (*dto.UserLo
 
 	err = s.verify.SetToken(ctx, "user:"+token, user.ID, time.Hour*24*7)
 	if err != nil {
-		return nil, common.RedisErr.WithErr(err)
+		return nil, common.RedisErr
 	}
 
 	return &dto.UserLoginResp{
@@ -55,19 +56,25 @@ func (s *Service) Register(ctx context.Context, req *dto.UserRegisterReq) (*dto.
 		return nil, common.ParamErr.WithMsg("手机号已注册")
 	}
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, common.DatabaseErr.WithErr(err)
+		return nil, common.DatabaseErr
+	}
+
+	// 使用bcrypt加密密码
+	hashedPassword, err := tools.HashPassword(req.Password)
+	if err != nil {
+		return nil, common.ServerErr
 	}
 
 	// 创建用户
 	userModel := &model.User{
 		Nickname: req.Nickname,
 		Mobile:   req.Mobile,
-		Password: tools.Sha256Hash(req.Password),
+		Password: hashedPassword,
 		Status:   1,
 	}
 
 	if err := s.userRepo.Create(ctx, userModel); err != nil {
-		return nil, common.DatabaseErr.WithErr(err)
+		return nil, common.DatabaseErr
 	}
 
 	// 自动登录
@@ -91,7 +98,7 @@ func (s *Service) GetUserInfo(ctx context.Context, userID int64) (*dto.CustomerU
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, common.UserNotFoundErr
 		}
-		return nil, common.DatabaseErr.WithErr(err)
+		return nil, common.DatabaseErr
 	}
 
 	return &dto.CustomerUserInfoResp{

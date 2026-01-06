@@ -14,6 +14,7 @@ import (
 	_ "app/docs"
 	"app/router"
 	"app/utils/logger"
+	"app/utils/tools"
 )
 
 // @title           App API
@@ -43,14 +44,18 @@ func main() {
 }
 
 func startServer(conf *config.Config, db *gorm.DB, redis *redis.Client) *router.App {
-	return router.NewApp(conf.Server.HttpPort,
+	return router.NewApp(
+		conf.Server.HttpPort,
+		conf.Server.ShutdownTimeout,
 		router.NewRouter(
 			conf,
 			adaptor.NewAdaptor(conf, db, redis),
 			func() error {
 				err := func() error {
 					pingDb, err := db.DB()
-					handleErr(err)
+					if err != nil {
+						return err
+					}
 					return pingDb.Ping()
 				}()
 				if err != nil {
@@ -145,11 +150,18 @@ func initSuperAdmin(db *gorm.DB) {
 		return
 	}
 
+	// 使用bcrypt加密密码
+	hashedPassword, err := tools.HashPassword("admin123")
+	if err != nil {
+		logger.Error("初始化超级管理员密码加密失败")
+		return
+	}
+
 	// 创建超级管理员 密码: admin123
 	admin := &model.AdminUser{
 		Name:     "admin",
 		NickName: "超级管理员",
-		Password: "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9", // sha256("admin123")
+		Password: hashedPassword,
 		Status:   1,
 		Sex:      1,
 	}

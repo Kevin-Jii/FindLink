@@ -1,21 +1,20 @@
 package router
 
 import (
-	"app/adaptor"
-	"app/api/admin"
-	"app/api/customer"
-	"app/common"
-	"app/config"
 	"context"
 	"net/http"
-	"app/utils/logger"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	// 避免未使用的导入错误
-	_ "app/adaptor/repo/model"
+	"app/adaptor"
+	appRedis "app/adaptor/redis"
+	"app/api/admin"
+	"app/api/customer"
+	"app/common"
+	"app/config"
+	"app/utils/logger"
 )
 
 type IRouter interface {
@@ -31,6 +30,7 @@ type Router struct {
 	checkFunc func() error
 	admin     *admin.Ctrl
 	customer  *customer.Ctrl
+	verify    appRedis.IVerify
 }
 
 func NewRouter(conf *config.Config, adaptor adaptor.IAdaptor, checkFunc func() error) *Router {
@@ -41,6 +41,7 @@ func NewRouter(conf *config.Config, adaptor adaptor.IAdaptor, checkFunc func() e
 		checkFunc: checkFunc,
 		admin:     admin.NewCtrl(adaptor),
 		customer:  customer.NewCtrl(adaptor),
+		verify:    appRedis.NewVerify(adaptor.GetRedis()),
 	}
 }
 
@@ -48,9 +49,7 @@ func (r *Router) checkServer() func(*gin.Context) {
 	return func(ctx *gin.Context) {
 		err := r.checkFunc()
 		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{
-				"message": err.Error(),
-			})
+			ctx.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 			return
 		}
 		ctx.JSON(http.StatusOK, gin.H{})
@@ -62,8 +61,6 @@ func (r *Router) Register(app *gin.Engine) {
 		SetupPprof(app, "/debug/pprof")
 	}
 	app.Any("/ping", r.checkServer())
-
-	// Swagger 文档
 	app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	root := app.Group(r.rootPath)
@@ -71,16 +68,10 @@ func (r *Router) Register(app *gin.Engine) {
 }
 
 func (r *Router) SpanFilter(ctx *gin.Context) bool {
-	// 检查白名单时需要带上 rootPath，因为白名单存储的是完整路径
 	fullPath := ctx.Request.URL.Path
-	logger.Debug("SpanFilter",
-		logger.String("fullPath", fullPath),
-		logger.Any("whiteList", AdminAuthWhiteList))
+	logger.Debug("SpanFilter", logger.String("fullPath", fullPath))
 	_, ok := AdminAuthWhiteList[fullPath]
-	if ok {
-		return false
-	}
-	return true
+	return !ok
 }
 
 func (r *Router) AccessRecordFilter(ctx *gin.Context) bool {
@@ -92,10 +83,26 @@ func (r *Router) route(root *gin.RouterGroup) {
 	r.adminRoute(root)
 }
 
+// validateUserToken 验证C端用户token
+func (r *Router) validateUserToken(ctx context.Context, token string) (*common.User, error) {
+	userID, err := r.verify.GetToken(ctx, "user:"+token)
+	if err != nil {
+		return nil, err
+	}
+	return &common.User{UserID: userID}, nil
+}
+
+// validateAdminToken 验证B端管理员token
+func (r *Router) validateAdminToken(ctx context.Context, token string) (*common.AdminUser, error) {
+	userID, err := r.verify.GetToken(ctx, "admin:"+token)
+	if err != nil {
+		return nil, err
+	}
+	return &common.AdminUser{UserID: userID}, nil
+}
+
 func (r *Router) customerRoute(root *gin.RouterGroup) {
-	cstRoot := root.Group("/customer", AuthMiddleware(r.SpanFilter, func(ctx context.Context, token string) (*common.User, error) {
-		return &common.User{}, nil
-	}))
+	cstRoot := root.Group("/customer", AuthMiddleware(r.SpanFilter, r.validateUserToken))
 
 	// C端用户 - 无需鉴权
 	cstRoot.POST("/v1/user/login", r.customer.Login)
@@ -152,12 +159,8 @@ func (r *Router) customerRoute(root *gin.RouterGroup) {
 }
 
 func (r *Router) adminRoute(root *gin.RouterGroup) {
-	adminRoot := root.Group("/admin", AdminAuthMiddleware(r.SpanFilter, func(ctx context.Context, token string) (*common.AdminUser, error) {
-		return &common.AdminUser{
-			UserID: 1,
-			Name:   "admin",
-		}, nil
-	}))
+	adminRoot := root.Group("/admin", AdminAuthMiddleware(r.SpanFilter, r.validateAdminToken))
+
 	// 登录无鉴权：添加白名单
 	adminRoot.GET("/v1/user/verify/captcha", r.admin.GetSmsCodeCaptcha)
 	adminRoot.POST("/v1/user/verify/captcha/check", r.admin.CheckSmsCodeCaptcha)
